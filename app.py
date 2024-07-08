@@ -1,0 +1,117 @@
+from flask import Flask, request, jsonify
+import replicate
+from functools import wraps
+
+app = Flask(__name__)
+
+import replicate
+import os
+
+import traceback
+import sys
+
+def require_api_token(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if token and token.startswith('Bearer '):
+            token = token.split('Bearer ')[1]
+            if token == "r8_JicPTYUGYHfRHIJjvqQydSZCFNGvXa41igAjg":
+                os.environ["REPLICATE_API_TOKEN"] = token
+                return f(*args, **kwargs)
+        return jsonify({"error": "Invalid or missing API token"}), 401
+    return decorated
+
+
+
+# runs vton as many times as needed to apply each article of clothing
+def run_vton(input, garm_list, category_list):
+
+    if (not garm_list) or (not category_list):
+        return input['human_img']
+
+    input['garm_img'] = garm_list[0]
+    input['category'] = category_list[0]
+
+    garm_list.remove(garm_list[0])
+    category_list.remove(category_list[0])
+
+    vton_output = replicate.run( 
+        "cuuupid/idm-vton:906425dbca90663ff5427624839572cc56ea7d380343d13e2a4c4b09d3f0c30f", 
+        input=input
+    )
+
+    input['human_img'] = vton_output
+
+    return run_vton(input, garm_list, category_list)
+
+
+
+
+@app.route('/generate_3d_from_vton', methods=['POST'])
+@require_api_token
+def generate_3d_from_vton():
+    
+    try:
+
+        print("Received new request for /generate_3d_from_vton", file=sys.stderr)
+
+        data = request.get_json(force=True, cache=False)
+        
+        print(f"New request data: {data}", file=sys.stderr)
+        
+        # Validate that required fields are present
+        if 'human_img' not in data or 'upper_body_img' not in data or 'lower_body_img' not in data:
+            return jsonify({"error": "Missing required fields: 'human_img' and/or 'garm_img'"}), 400
+            
+        # First model: cuuupid/idm-vton
+        vton_input = {
+            "human_img": data.get('human_img'),
+            "crop": True,
+            "seed": data.get('seed', 30),
+            "steps": 40,
+            "mask_only": False,
+            "force_dc": False,
+            "garment_des": ''
+        }
+
+        garm_list = [data.get('lower_body_img'), data.get('upper_body_img')]
+        category_list = ['lower_body', 'upper_body']
+
+        print(garm_list)
+    
+        vton_output = run_vton(vton_input, garm_list, category_list)
+
+        generated_image_url = vton_output[0] if isinstance(vton_output, list) else vton_output
+        
+        print("Generated image URL:", generated_image_url)
+
+        # Second model: deepeshsharma2003/3dmg
+        dmg_input = {
+            "seed": data.get('seed', 42),
+            "image_path": generated_image_url,
+            "export_video": True,
+            "sample_steps": 300,
+            "export_texmap": False,
+            "remove_background": True
+        }
+
+        print("Running 3DMG model...")
+        dmg_output = replicate.run(
+            "deepeshsharma2003/3dmg:476f025230580cb41ffc3b3d6457965f968c63d1db4a0737bef338a851eb62d6",
+            input=dmg_input
+        )[2]
+
+        return jsonify({"result": dmg_output}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/test', methods=['GET'])
+def test():
+    return jsonify({"message": "API is working!"}), 200
+
+
+if __name__ == '__main__':
+    print("Starting Flask server...")
+    app.run(debug=True, host='0.0.0.0', port=5000)
