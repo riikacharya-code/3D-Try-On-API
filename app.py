@@ -34,20 +34,10 @@ def run_vton(input, garm_list, category_list):
     garm_list.remove(garm_list[0])
     category_list.remove(category_list[0])
 
-    print()
-    print("Running vton")
-
-    print()
-    print(input['garm_img'])
-    print(input['human_img'])
-
     vton_output = replicate.run( 
         "cuuupid/idm-vton:906425dbca90663ff5427624839572cc56ea7d380343d13e2a4c4b09d3f0c30f", 
         input=input
     )
-
-    print()
-    print("vton done")
 
     input['human_img'] = vton_output
 
@@ -77,8 +67,7 @@ def generate_3d_from_vton():
         # Validate that required fields are present
         if 'human_img' not in data or 'upper_body_img' not in data or 'lower_body_img' not in data:
             return jsonify({"error": "Missing required fields: 'human_img' and/or 'garm_img'"}), 400
-        
-
+            
         # First model: cuuupid/idm-vton
         vton_input = {
             "human_img": data.get('human_img'),
@@ -113,11 +102,7 @@ def generate_3d_from_vton():
         dmg_output = replicate.run(
             "deepeshsharma2003/3dmg:476f025230580cb41ffc3b3d6457965f968c63d1db4a0737bef338a851eb62d6",
             input=dmg_input
-        )
-    
-        print(dmg_output[0])
-        print(dmg_output[1])
-        print(dmg_output[2])
+        )[2]
 
         return jsonify({"result": dmg_output[1]}), 200
     except Exception as e:

@@ -72,9 +72,8 @@ if __name__ == "__main__":
     upper_body_img = "https://www.3wisemen.co.nz/media/catalog/product/c/6/c60_2311288_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=700&width=700&canvas=700:700"
     lower_body_img = "https://truewerk.com/cdn/shop/files/t2_werkpants_mens_sand_flat_lay_8ef2f98e-2d28-4d79-9661-ccab84a67cf3.jpg?v=1701119637&width=2400"
     seed = 42
-    crop = True
 
     api_token = "r8_OUgsjAHZtSSQeGjbSUs15wlF4GCcdsP0hgm4L" #replace with your own API key
 
-    result = send_request_to_api(human_img, upper_body_img, lower_body_img, api_token, seed, crop)
+    result = send_request_to_api(human_img, upper_body_img, lower_body_img, api_token, seed)
     print(result)
