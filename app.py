@@ -7,7 +7,7 @@ app = Flask(__name__)
 import replicate
 import os
 
-import traceback
+
 import sys
 
 def require_api_token(f):
