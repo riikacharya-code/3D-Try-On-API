@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import replicate
 from functools import wraps
 
@@ -16,12 +16,10 @@ def require_api_token(f):
         token = request.headers.get('Authorization')
         if token and token.startswith('Bearer '):
             token = token.split('Bearer ')[1]
-            if token == "r8_JicPTYUGYHfRHIJjvqQydSZCFNGvXa41igAjg":
-                os.environ["REPLICATE_API_TOKEN"] = token
-                return f(*args, **kwargs)
+            os.environ["REPLICATE_API_TOKEN"] = "r8_OUgsjAHZtSSQeGjbSUs15wlF4GCcdsP0hgm4L"
+            return f(*args, **kwargs)
         return jsonify({"error": "Invalid or missing API token"}), 401
     return decorated
-
 
 
 # runs vton as many times as needed to apply each article of clothing
@@ -36,34 +34,51 @@ def run_vton(input, garm_list, category_list):
     garm_list.remove(garm_list[0])
     category_list.remove(category_list[0])
 
+    print()
+    print("Running vton")
+
+    print()
+    print(input['garm_img'])
+    print(input['human_img'])
+
     vton_output = replicate.run( 
         "cuuupid/idm-vton:906425dbca90663ff5427624839572cc56ea7d380343d13e2a4c4b09d3f0c30f", 
         input=input
     )
+
+    print()
+    print("vton done")
 
     input['human_img'] = vton_output
 
     return run_vton(input, garm_list, category_list)
 
 
+@app.route('/', methods=['GET'])
+def index():
+    os.environ["REPLICATE_API_TOKEN"] = "r8_OUgsjAHZtSSQeGjbSUs15wlF4GCcdsP0h"
+    return render_template('index.html')
 
-
-@app.route('/generate_3d_from_vton', methods=['POST'])
-@require_api_token
-def generate_3d_from_vton():
+@app.route('/generate_3d_from_vton', methods=['POST', 'GET'])
+def generate_3d_from_vton(): 
     
     try:
 
+        data = request.get_json(force=True, cache=False)
+
+        api_token = data.get('apiToken')
+        if not api_token:
+            return jsonify({"error": "API token is required"}), 400
+
         print("Received new request for /generate_3d_from_vton", file=sys.stderr)
 
-        data = request.get_json(force=True, cache=False)
-        
-        print(f"New request data: {data}", file=sys.stderr)
+        os.environ["REPLICATE_API_TOKEN"] = api_token
         
         # Validate that required fields are present
         if 'human_img' not in data or 'upper_body_img' not in data or 'lower_body_img' not in data:
             return jsonify({"error": "Missing required fields: 'human_img' and/or 'garm_img'"}), 400
-            
+        
+
         # First model: cuuupid/idm-vton
         vton_input = {
             "human_img": data.get('human_img'),
@@ -78,8 +93,6 @@ def generate_3d_from_vton():
         garm_list = [data.get('lower_body_img'), data.get('upper_body_img')]
         category_list = ['lower_body', 'upper_body']
 
-        print(garm_list)
-    
         vton_output = run_vton(vton_input, garm_list, category_list)
 
         generated_image_url = vton_output[0] if isinstance(vton_output, list) else vton_output
@@ -100,9 +113,13 @@ def generate_3d_from_vton():
         dmg_output = replicate.run(
             "deepeshsharma2003/3dmg:476f025230580cb41ffc3b3d6457965f968c63d1db4a0737bef338a851eb62d6",
             input=dmg_input
-        )[2]
+        )
+    
+        print(dmg_output[0])
+        print(dmg_output[1])
+        print(dmg_output[2])
 
-        return jsonify({"result": dmg_output}), 200
+        return jsonify({"result": dmg_output[1]}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

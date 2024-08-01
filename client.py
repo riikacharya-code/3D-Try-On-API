@@ -4,7 +4,8 @@ import uuid
 
 
 def send_request_to_api(human_img, upper_body_img, lower_body_img, api_token, seed=42, crop=False):
-    url = "http://localhost:5000/generate_3d_from_vton"
+
+    url = "http://192.168.1.8:5000/generate_3d_from_vton"
 
     data = {
         "human_img": human_img,
@@ -13,7 +14,8 @@ def send_request_to_api(human_img, upper_body_img, lower_body_img, api_token, se
         "seed": seed,
         "force_dc": False,
         "crop": crop,
-        "request_id": str(uuid.uuid4())
+        "request_id": str(uuid.uuid4()),
+        'apiToken': api_token
     }
 
     headers = {
@@ -21,6 +23,8 @@ def send_request_to_api(human_img, upper_body_img, lower_body_img, api_token, se
         'Authorization': f'Bearer {api_token}',
         'Cache-Control': 'no-cache'
     }
+    
+    print(json.dumps(data))
 
     try:
         print("Sending request to API...")
@@ -37,7 +41,7 @@ def send_request_to_api(human_img, upper_body_img, lower_body_img, api_token, se
 
 
 def test_api_connection():
-    url = "http://localhost:5000/test"
+    url = "http://192.168.1.8:5000/test"
     try:
         response = requests.get(url)
         print(f"Test response status code: {response.status_code}")
@@ -64,14 +68,13 @@ if __name__ == "__main__":
     Some examples of input clothes are in the files 'upper_body.txt' and 'lower_body.txt'.
     '''
 
-
     human_img = "https://time.com/shopping/static/07879e7b8e0ca5c988fadbc8ee6548e0/ca7ff/best-womens-dress-pants-for-work.jpg"
     upper_body_img = "https://www.3wisemen.co.nz/media/catalog/product/c/6/c60_2311288_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=700&width=700&canvas=700:700"
     lower_body_img = "https://truewerk.com/cdn/shop/files/t2_werkpants_mens_sand_flat_lay_8ef2f98e-2d28-4d79-9661-ccab84a67cf3.jpg?v=1701119637&width=2400"
     seed = 42
     crop = True
 
-    api_token = "r8_JicPTYUGYHfRHIJjvqQydSZCFNGvXa41igAjg" #replace with your own API key
+    api_token = "r8_OUgsjAHZtSSQeGjbSUs15wlF4GCcdsP0hgm4L" #replace with your own API key
 
     result = send_request_to_api(human_img, upper_body_img, lower_body_img, api_token, seed, crop)
     print(result)
