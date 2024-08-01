@@ -6,8 +6,6 @@ app = Flask(__name__)
 
 import replicate
 import os
-
-
 import sys
 
 def require_api_token(f):
@@ -16,7 +14,7 @@ def require_api_token(f):
         token = request.headers.get('Authorization')
         if token and token.startswith('Bearer '):
             token = token.split('Bearer ')[1]
-            os.environ["REPLICATE_API_TOKEN"] = "r8_OUgsjAHZtSSQeGjbSUs15wlF4GCcdsP0hgm4L"
+            os.environ["REPLICATE_API_TOKEN"] = token
             return f(*args, **kwargs)
         return jsonify({"error": "Invalid or missing API token"}), 401
     return decorated

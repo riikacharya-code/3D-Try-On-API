@@ -73,7 +73,7 @@ if __name__ == "__main__":
     lower_body_img = "https://truewerk.com/cdn/shop/files/t2_werkpants_mens_sand_flat_lay_8ef2f98e-2d28-4d79-9661-ccab84a67cf3.jpg?v=1701119637&width=2400"
     seed = 42
 
-    api_token = "r8_OUgsjAHZtSSQeGjbSUs15wlF4GCcdsP0hgm4L" #replace with your own API key
+    api_token = "Your Own API Key" #replace with your own API key
 
     result = send_request_to_api(human_img, upper_body_img, lower_body_img, api_token, seed)
     print(result)

@@ -27,7 +27,7 @@ def upload_to_imgbb(image_file):
 st.title("Virtual Try-On and 3D Model Generator")
 
 # Input for API token
-api_token = 'r8_OUgsjAHZtSSQeGjbSUs15wlF4GCcdsP0hgm4L'
+api_token = st.text_input("Enter your Replicate API token. Sign up for ReplicateAI and obtain a token if you do not have one already:", type="password")
 
 # File upload for human image
 human_img_file = st.file_uploader("Upload human image", type=["png", "jpg", "jpeg"])
