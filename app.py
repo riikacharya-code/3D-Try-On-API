@@ -38,7 +38,6 @@ def run_vton(input, garm_list, category_list):
         "cuuupid/idm-vton:906425dbca90663ff5427624839572cc56ea7d380343d13e2a4c4b09d3f0c30f", 
         input=input
     )
-
     input['human_img'] = vton_output
 
     return run_vton(input, garm_list, category_list)
