@@ -101,7 +101,7 @@ def generate_3d_from_vton():
         dmg_output = replicate.run(
             "deepeshsharma2003/3dmg:476f025230580cb41ffc3b3d6457965f968c63d1db4a0737bef338a851eb62d6",
             input=dmg_input
-        )[2]
+        )
 
         return jsonify({"result": dmg_output[1]}), 200
     except Exception as e:
