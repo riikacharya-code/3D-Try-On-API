@@ -8,6 +8,7 @@ VTON_API_ENDPOINT = "http://192.168.1.8:5000/generate_3d_from_vton"
 IMGBB_API_ENDPOINT = "https://api.imgbb.com/1/upload"
 IMGBB_API_KEY = "bccd65ab8da85ebc87c6a9d81e41d1de"  # Replace with your ImgBB API key
 
+
 def upload_to_imgbb(image_file):
     img_bytes = image_file.getvalue()
     base64_image = base64.b64encode(img_bytes).decode('utf-8')
@@ -23,6 +24,7 @@ def upload_to_imgbb(image_file):
     else:
         st.error(f"Failed to upload image to ImgBB. Status code: {response.status_code}")
         return None
+
 
 st.title("Virtual Try-On and 3D Model Generator")
 
