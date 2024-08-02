@@ -4,7 +4,7 @@ from PIL import Image
 import base64
 
 # Set the API endpoints
-VTON_API_ENDPOINT = "http://localhost:5000/generate_3d_from_vton"
+VTON_API_ENDPOINT = "http://192.168.1.8:5000/generate_3d_from_vton"
 IMGBB_API_ENDPOINT = "https://api.imgbb.com/1/upload"
 IMGBB_API_KEY = "bccd65ab8da85ebc87c6a9d81e41d1de"  # Replace with your ImgBB API key
 
