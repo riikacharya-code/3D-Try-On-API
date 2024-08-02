@@ -41,11 +41,6 @@ def run_vton(input, garm_list, category_list):
     return run_vton(input, garm_list, category_list)
 
 
-@app.route('/', methods=['GET'])
-def index():
-    os.environ["REPLICATE_API_TOKEN"] = "r8_OUgsjAHZtSSQeGjbSUs15wlF4GCcdsP0h"
-    return render_template('index.html')
-
 @app.route('/generate_3d_from_vton', methods=['POST', 'GET'])
 def generate_3d_from_vton(): 
     
